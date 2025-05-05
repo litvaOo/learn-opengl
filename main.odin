@@ -25,6 +25,10 @@ main :: proc() {
   gl.Viewport(0, 0, 800, 600)
 
   for !glfw.WindowShouldClose(window) {
+    if glfw.GetKey(window, glfw.KEY_ESCAPE) == glfw.PRESS {
+      glfw.SetWindowShouldClose(window, true)
+    }
+    gl.ClearColor(0.2, 0.3, 0.3, 1.0)
     gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     glfw.SwapBuffers(window)
     glfw.PollEvents()
