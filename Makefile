@@ -1,2 +1,5 @@
-run:
-	mkdir -p target/ && odin run . -out:target/main -debug
+run: build
+	./target/main
+
+build:
+	mkdir -p target/ && odin build . -out:target/main -debug
