@@ -3,6 +3,7 @@ package main
 import gl "vendor:OpenGL"
 import glfw "vendor:glfw"
 import "core:strings"
+import "core:math"
 
 framebuffer_resize_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
   gl.Viewport(0, 0, width, height)
@@ -22,21 +23,11 @@ main :: proc() {
   glfw.SetFramebufferSizeCallback(window, framebuffer_resize_callback)
   gl.load_up_to(4, 1, glfw.gl_set_proc_address)
 
-  gl.Viewport(0, 0, 800, 600)
-
-
   vertices := []f32{
-     0.5,  0.5, 0.0,
-     0.5, -0.5, 0.0,
-    -0.5, -0.5, 0.0,
-    -0.5,  0.5, 0.0,
+     0.5, -0.5, 0.0,  1.0, 0.0, 0.0,
+    -0.5, -0.5, 0.0,  0.0, 1.0, 0.0,
+     0.0,  0.5, 0.0,  0.0, 0.0, 1.0 
   }
-
-  indices := []u32{
-    0, 1, 3,
-    1, 2, 3,
-  }
-
 
   vertex_shader := gl.CreateShader(gl.VERTEX_SHADER)
   vertex_shader_source_raw := read_file("shaders/shader.vert")
@@ -50,24 +41,12 @@ main :: proc() {
   gl.ShaderSource(fragment_shader, 1, &fragment_shader_source, nil)
   gl.CompileShader(fragment_shader)
 
-  fragment_shader_new := gl.CreateShader(gl.FRAGMENT_SHADER)
-  fragment_shader_source_new_raw := read_file("shaders/shader_yellow.frag")
-  fragment_shader_source_new := cstring(raw_data(fragment_shader_source_new_raw))
-  gl.ShaderSource(fragment_shader_new, 1, &fragment_shader_source_new, nil)
-  gl.CompileShader(fragment_shader_new)
-
   shader_program := gl.CreateProgram()
   gl.AttachShader(shader_program, vertex_shader)
   gl.AttachShader(shader_program, fragment_shader)
   gl.LinkProgram(shader_program)
 
-  shader_program_2 := gl.CreateProgram()
-  gl.AttachShader(shader_program_2, vertex_shader)
-  gl.AttachShader(shader_program_2, fragment_shader_new)
-  gl.LinkProgram(shader_program_2)
-
-  vao, vbo, ebo: u32
-  gl.GenBuffers(1, &ebo)
+  vao, vbo: u32
   gl.GenVertexArrays(1, &vao)
   gl.GenBuffers(1, &vbo)
 
@@ -76,35 +55,20 @@ main :: proc() {
   gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
   gl.BufferData(gl.ARRAY_BUFFER, len(vertices) * size_of(f32), raw_data(vertices), gl.STATIC_DRAW)
 
-  gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
-  gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(indices) * size_of(u32), raw_data(indices), gl.STATIC_DRAW)
-
-  gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 3 * size_of(f32), 0)
+  gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 6 * size_of(f32), 0)
   gl.EnableVertexAttribArray(0)
 
-  gl.BindBuffer(gl.ARRAY_BUFFER, 0)
-  gl.BindVertexArray(0)
-
-  vao_2, vbo_2, ebo_2: u32
-  gl.GenBuffers(1, &ebo_2)
-  gl.GenVertexArrays(1, &vao_2)
-  gl.GenBuffers(1, &vbo_2)
-
-  for &vert in vertices {
-    vert += 0.5
-  }
-  gl.BindVertexArray(vao_2)
-  gl.BindBuffer(gl.ARRAY_BUFFER, vbo_2)
-  gl.BufferData(gl.ARRAY_BUFFER, len(vertices) * size_of(f32), raw_data(vertices), gl.STATIC_DRAW)
-
-  gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo_2)
-  gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(indices) * size_of(u32), raw_data(indices), gl.STATIC_DRAW)
-
-  gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 3 * size_of(f32), 0)
-  gl.EnableVertexAttribArray(0)
+  gl.VertexAttribPointer(1, 3, gl.FLOAT, false, 6 * size_of(f32), 3 * size_of(f32))
+  gl.EnableVertexAttribArray(1)
 
   wireframe_mode := false
   space_pressed := false
+
+  gl.UseProgram(shader_program)
+  vertex_offset_location := gl.GetUniformLocation(shader_program, "offsetVec")
+  vertex_offset := []f32{0.5, 0.5, 0.5}
+  gl.Uniform3fv(vertex_offset_location, 1, raw_data(vertex_offset))
+
   for !glfw.WindowShouldClose(window) {
     if glfw.GetKey(window, glfw.KEY_ESCAPE) == glfw.PRESS {
       glfw.SetWindowShouldClose(window, true)
@@ -128,15 +92,9 @@ main :: proc() {
     }
     gl.ClearColor(0.2, 0.3, 0.3, 1.0)
     gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-    gl.UseProgram(shader_program)
     gl.BindVertexArray(vao)
-    gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
-    gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_INT, nil)
+    gl.DrawArrays(gl.TRIANGLES, 0, 3)
 
-    gl.UseProgram(shader_program_2)
-    gl.BindVertexArray(vao_2)
-    gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo_2)
-    gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_INT, nil)
     glfw.SwapBuffers(window)
     glfw.PollEvents()
   }
