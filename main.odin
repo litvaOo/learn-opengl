@@ -115,6 +115,9 @@ main :: proc() {
     gl.GenerateMipmap(gl.TEXTURE_2D)
   }
 
+
+  mix_factor_location := gl.GetUniformLocation(shader_program, "mixFactor")
+  mix_factor :f32 = 0.2
   for !glfw.WindowShouldClose(window) {
     input: {
       if glfw.GetKey(window, glfw.KEY_ESCAPE) == glfw.PRESS {
@@ -137,6 +140,16 @@ main :: proc() {
           space_pressed = false
         }
       }
+      if glfw.GetKey(window, glfw.KEY_UP) == glfw.PRESS {
+        if mix_factor < 1.0 {
+          mix_factor += 0.01
+        }
+      }
+      if glfw.GetKey(window, glfw.KEY_DOWN) == glfw.PRESS {
+        if mix_factor > 0.0 {
+          mix_factor -= 0.01
+        }
+      }
     }
     gl.ClearColor(0.2, 0.3, 0.3, 1.0)
     gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -145,6 +158,7 @@ main :: proc() {
     gl.ActiveTexture(gl.TEXTURE1)
     gl.BindTexture(gl.TEXTURE_2D, texture_2)
     gl.BindVertexArray(vao)
+    gl.Uniform1f(mix_factor_location, mix_factor)
     gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_INT, nil)
     glfw.SwapBuffers(window)
     glfw.PollEvents()
