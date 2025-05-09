@@ -4,6 +4,7 @@ import gl "vendor:OpenGL"
 import glfw "vendor:glfw"
 import "core:strings"
 import "core:math"
+import "core:math/linalg"
 
 framebuffer_resize_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
   gl.Viewport(0, 0, width, height)
@@ -84,6 +85,7 @@ main :: proc() {
   space_pressed := false
 
   gl.UseProgram(shader_program)
+
   gl.Uniform1i(gl.GetUniformLocation(shader_program, "inTexture"), 0)
   gl.Uniform1i(gl.GetUniformLocation(shader_program, "inTexture2"), 1)
 
@@ -115,9 +117,10 @@ main :: proc() {
     gl.GenerateMipmap(gl.TEXTURE_2D)
   }
 
-
   mix_factor_location := gl.GetUniformLocation(shader_program, "mixFactor")
   mix_factor :f32 = 0.2
+
+  transform_loc := gl.GetUniformLocation(shader_program, "transform")
   for !glfw.WindowShouldClose(window) {
     input: {
       if glfw.GetKey(window, glfw.KEY_ESCAPE) == glfw.PRESS {
@@ -158,8 +161,20 @@ main :: proc() {
     gl.ActiveTexture(gl.TEXTURE1)
     gl.BindTexture(gl.TEXTURE_2D, texture_2)
     gl.BindVertexArray(vao)
+    transform := linalg.identity_matrix(matrix[4, 4]f32)
+    transform = linalg.matrix_mul(transform, linalg.matrix4_rotate(f32( glfw.GetTime() ), [3]f32{0.0, 0.0, 1.0}))
+    transform = linalg.matrix_mul(transform, linalg.matrix4_translate_f32([3]f32{0.5, -0.5, 0.0}))
+    gl.UniformMatrix4fv(transform_loc, 1, false, raw_data(&transform))
     gl.Uniform1f(mix_factor_location, mix_factor)
     gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_INT, nil)
+    //second rectangle
+    new_transform := linalg.identity_matrix(matrix[4, 4]f32)
+    new_transform = linalg.matrix_mul(new_transform, linalg.matrix4_translate_f32([3]f32{-0.5, 0.5, 1.0}))
+    new_time := f32(glfw.GetTime())
+    new_transform = linalg.matrix_mul(new_transform, linalg.matrix4_scale_f32([3]f32{math.sin(new_time), math.sin(new_time), 1.0}))
+    gl.UniformMatrix4fv(transform_loc, 1, false, raw_data(&new_transform))
+    gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_INT, nil)
+
     glfw.SwapBuffers(window)
     glfw.PollEvents()
   }
