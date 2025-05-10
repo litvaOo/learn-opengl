@@ -1,7 +1,5 @@
 #version 410 core
 
-in vec3 fragColor;
-in vec4 fragPos;
 in vec2 texCoord;
 out vec4 outColor;
 

@@ -28,16 +28,49 @@ main :: proc() {
   }
 
   vertices := []f32{
-     0.5,  0.5, 0.0,   1.0, 0.0, 0.0,   1.0, 1.0,
-     0.5, -0.5, 0.0,   0.0, 1.0, 0.0,   1.0, 0.0,
-    -0.5, -0.5, 0.0,   0.0, 0.0, 1.0,   0.0, 0.0,
-    -0.5,  0.5, 0.0,   1.0, 1.0, 0.0,   0.0, 1.0,
+    -0.5, -0.5, -0.5,  0.0, 0.0,
+     0.5, -0.5, -0.5,  1.0, 0.0,
+     0.5,  0.5, -0.5,  1.0, 1.0,
+     0.5,  0.5, -0.5,  1.0, 1.0,
+    -0.5,  0.5, -0.5,  0.0, 1.0,
+    -0.5, -0.5, -0.5,  0.0, 0.0,
+
+    -0.5, -0.5,  0.5,  0.0, 0.0,
+     0.5, -0.5,  0.5,  1.0, 0.0,
+     0.5,  0.5,  0.5,  1.0, 1.0,
+     0.5,  0.5,  0.5,  1.0, 1.0,
+    -0.5,  0.5,  0.5,  0.0, 1.0,
+    -0.5, -0.5,  0.5,  0.0, 0.0,
+
+    -0.5,  0.5,  0.5,  1.0, 0.0,
+    -0.5,  0.5, -0.5,  1.0, 1.0,
+    -0.5, -0.5, -0.5,  0.0, 1.0,
+    -0.5, -0.5, -0.5,  0.0, 1.0,
+    -0.5, -0.5,  0.5,  0.0, 0.0,
+    -0.5,  0.5,  0.5,  1.0, 0.0,
+
+     0.5,  0.5,  0.5,  1.0, 0.0,
+     0.5,  0.5, -0.5,  1.0, 1.0,
+     0.5, -0.5, -0.5,  0.0, 1.0,
+     0.5, -0.5, -0.5,  0.0, 1.0,
+     0.5, -0.5,  0.5,  0.0, 0.0,
+     0.5,  0.5,  0.5,  1.0, 0.0,
+
+    -0.5, -0.5, -0.5,  0.0, 1.0,
+     0.5, -0.5, -0.5,  1.0, 1.0,
+     0.5, -0.5,  0.5,  1.0, 0.0,
+     0.5, -0.5,  0.5,  1.0, 0.0,
+    -0.5, -0.5,  0.5,  0.0, 0.0,
+    -0.5, -0.5, -0.5,  0.0, 1.0,
+
+    -0.5,  0.5, -0.5,  0.0, 1.0,
+     0.5,  0.5, -0.5,  1.0, 1.0,
+     0.5,  0.5,  0.5,  1.0, 0.0,
+     0.5,  0.5,  0.5,  1.0, 0.0,
+    -0.5,  0.5,  0.5,  0.0, 0.0,
+    -0.5,  0.5, -0.5,  0.0, 1.0
   }
 
-  indices := []i32{
-      0, 1, 3,
-      1, 2, 3,
-  };
 
   shader_program := gl.CreateProgram()
   shaders: {
@@ -56,45 +89,36 @@ main :: proc() {
     gl.AttachShader(shader_program, vertex_shader)
     gl.AttachShader(shader_program, fragment_shader)
     gl.LinkProgram(shader_program)
+
+    gl.Enable(gl.DEPTH_TEST)
   }
 
 
-  vao, vbo, ebo: u32
-  gl.GenBuffers(1, &ebo)
-  gl.GenVertexArrays(1, &vao)
-  gl.GenBuffers(1, &vbo)
+  vao, vbo: u32
+  buffer_setup: {
+    gl.GenVertexArrays(1, &vao)
+    gl.GenBuffers(1, &vbo)
 
-  gl.BindVertexArray(vao)
+    gl.BindVertexArray(vao)
 
-  gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-  gl.BufferData(gl.ARRAY_BUFFER, len(vertices) * size_of(f32), raw_data(vertices), gl.STATIC_DRAW)
+    gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
+    gl.BufferData(gl.ARRAY_BUFFER, len(vertices) * size_of(f32), raw_data(vertices), gl.STATIC_DRAW)
 
-  gl.BindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo)
-  gl.BufferData(gl.ELEMENT_ARRAY_BUFFER, len(indices) * size_of(i32), raw_data(indices), gl.STATIC_DRAW)
+    gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 5 * size_of(f32), 0)
+    gl.EnableVertexAttribArray(0)
 
-  gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 8 * size_of(f32), 0)
-  gl.EnableVertexAttribArray(0)
+    gl.VertexAttribPointer(1, 3, gl.FLOAT, false, 5 * size_of(f32), 3 * size_of(f32))
+    gl.EnableVertexAttribArray(1)
 
-  gl.VertexAttribPointer(1, 3, gl.FLOAT, false, 8 * size_of(f32), 3 * size_of(f32))
-  gl.EnableVertexAttribArray(1)
+  }
 
-  gl.VertexAttribPointer(2, 2, gl.FLOAT, false, 8 * size_of(f32), 6 * size_of(f32))
-  gl.EnableVertexAttribArray(2)
-
-  wireframe_mode := false
-  space_pressed := false
-
-  gl.UseProgram(shader_program)
-
-  gl.Uniform1i(gl.GetUniformLocation(shader_program, "inTexture"), 0)
-  gl.Uniform1i(gl.GetUniformLocation(shader_program, "inTexture2"), 1)
-
-  vertex_offset_location := gl.GetUniformLocation(shader_program, "offsetVec")
-  vertex_offset := []f32{0.5, 0.5, 0.5}
-  gl.Uniform3fv(vertex_offset_location, 1, raw_data(vertex_offset))
 
   texture_1, texture_2: u32
   textures: {
+    gl.UseProgram(shader_program)
+
+    gl.Uniform1i(gl.GetUniformLocation(shader_program, "inTexture"), 0)
+    gl.Uniform1i(gl.GetUniformLocation(shader_program, "inTexture2"), 1)
     gl.GenTextures(1, &texture_1)
     gl.BindTexture(gl.TEXTURE_2D, texture_1)
     gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
@@ -119,8 +143,9 @@ main :: proc() {
 
   mix_factor_location := gl.GetUniformLocation(shader_program, "mixFactor")
   mix_factor :f32 = 0.2
+  wireframe_mode := false
+  space_pressed := false
 
-  transform_loc := gl.GetUniformLocation(shader_program, "transform")
   for !glfw.WindowShouldClose(window) {
     input: {
       if glfw.GetKey(window, glfw.KEY_ESCAPE) == glfw.PRESS {
@@ -154,6 +179,7 @@ main :: proc() {
         }
       }
     }
+    gl.Uniform1f(mix_factor_location, mix_factor)
     gl.ClearColor(0.2, 0.3, 0.3, 1.0)
     gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     gl.ActiveTexture(gl.TEXTURE0)
@@ -161,19 +187,34 @@ main :: proc() {
     gl.ActiveTexture(gl.TEXTURE1)
     gl.BindTexture(gl.TEXTURE_2D, texture_2)
     gl.BindVertexArray(vao)
-    transform := linalg.identity_matrix(matrix[4, 4]f32)
-    transform = linalg.matrix_mul(transform, linalg.matrix4_rotate(f32( glfw.GetTime() ), [3]f32{0.0, 0.0, 1.0}))
-    transform = linalg.matrix_mul(transform, linalg.matrix4_translate_f32([3]f32{0.5, -0.5, 0.0}))
-    gl.UniformMatrix4fv(transform_loc, 1, false, raw_data(&transform))
-    gl.Uniform1f(mix_factor_location, mix_factor)
-    gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_INT, nil)
-    //second rectangle
-    new_transform := linalg.identity_matrix(matrix[4, 4]f32)
-    new_transform = linalg.matrix_mul(new_transform, linalg.matrix4_translate_f32([3]f32{-0.5, 0.5, 1.0}))
-    new_time := f32(glfw.GetTime())
-    new_transform = linalg.matrix_mul(new_transform, linalg.matrix4_scale_f32([3]f32{math.sin(new_time), math.sin(new_time), 1.0}))
-    gl.UniformMatrix4fv(transform_loc, 1, false, raw_data(&new_transform))
-    gl.DrawElements(gl.TRIANGLES, i32(len(indices)), gl.UNSIGNED_INT, nil)
+    cubePositions := [][3]f32{
+      {0.0,  0.0,  0.0},
+      {2.0,  5.0, -15.0},
+      {-1.5, -2.2, -2.5},
+      {-3.8, -2.0, -12.3},
+      {2.4, -0.4, -3.5},
+      {-1.7,  3.0, -7.5},
+      {1.3, -2.0, -2.5},
+      {1.5,  2.0, -2.5},
+      {1.5,  0.2, -1.5},
+      {-1.3,  1.0, -1.5},
+    }
+    for i in 0..<len(cubePositions) {
+      position := cubePositions[i]
+      model_matrix := linalg.identity_matrix(matrix[4, 4]f32)
+      model_matrix = linalg.matrix_mul(model_matrix, linalg.matrix4_translate_f32(position))
+      angle := f32(i+1) * 20.0
+      model_matrix = linalg.matrix_mul(model_matrix, linalg.matrix4_rotate_f32(f32(glfw.GetTime()) * math.to_radians_f32(angle), [3]f32{1.0, 0.3, 0.5} ))
+      view_matrix := linalg.identity_matrix(matrix[4, 4]f32)
+      view_matrix = linalg.matrix_mul(view_matrix, linalg.matrix4_translate_f32([3]f32{0.0, 0.0, -3.0} ))
+      projection_matrix := linalg.identity_matrix(matrix[4, 4]f32)
+      projection_matrix = linalg.matrix_mul(projection_matrix, linalg.matrix4_perspective_f32(math.to_radians_f32(45.0), 800.0 / 600.0, 0.1, 100.0))
+
+      gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "model"), 1, false, raw_data(&model_matrix))
+      gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "view"), 1, false, raw_data(&view_matrix))
+      gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "projection"), 1, false, raw_data(&projection_matrix))
+      gl.DrawArrays(gl.TRIANGLES, 0, 36)
+    }
 
     glfw.SwapBuffers(window)
     glfw.PollEvents()
