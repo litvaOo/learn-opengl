@@ -20,6 +20,27 @@ Vector4 :: [4]f32
 Vector3 :: [3]f32
 Vector2 :: [2]f32
 
+look_at :: proc(position, target, up: Vector3) -> matrix[4, 4]f32{
+  camera_matrix := linalg.identity(matrix[4, 4]f32)
+  camera_matrix[0][3] = -position.x
+  camera_matrix[1][3] = -position.y
+  camera_matrix[2][3] = -position.z
+
+  right_vector := linalg.cross(up, target)
+
+  result := linalg.identity(matrix[4, 4]f32)
+  result[0][0] = right_vector.x
+  result[0][1] = right_vector.y
+  result[0][2] = right_vector.z
+  result[1][0] = up.x
+  result[1][1] = up.y
+  result[1][2] = up.z
+  result[2][0] = target.x
+  result[2][1] = target.y
+  result[2][2] = target.z
+  return linalg.matrix_mul(camera_matrix, result)
+}
+
 main :: proc() {
   window: glfw.WindowHandle
   init: {
@@ -241,6 +262,7 @@ main :: proc() {
       cam_x := math.sin(f32( glfw.GetTime() )) * radius
       cam_z := math.cos(f32( glfw.GetTime() )) * radius
       view_matrix := linalg.matrix4_look_at_f32(camera_pos, camera_pos + camera_front, camera_up)
+      // view_matrix := look_at(camera_pos, camera_pos + camera_front, camera_up)
       view_matrix = linalg.matrix_mul(view_matrix, linalg.matrix4_translate_f32(Vector3{0.0, 0.0, -3.0} ))
       projection_matrix := linalg.matrix4_perspective_f32(math.to_radians_f32(fov), 800.0/600.0, 0.1, 100.0)
 
