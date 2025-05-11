@@ -6,9 +6,15 @@ import "core:strings"
 import "core:math"
 import "core:math/linalg"
 
-framebuffer_resize_callback :: proc "c" (window: glfw.WindowHandle, width, height: i32) {
-  gl.Viewport(0, 0, width, height)
-}
+last_x, last_y : f32 = 400, 300
+yaw : f32 = -90.0
+pitch : f32 = 0
+first_mouse := true
+camera_pos := Vector3{0.0, 0.0, 3.0}
+camera_front := Vector3{0.0, 0.0, -1.0}
+camera_up := Vector3{0.0, 1.0, 0.0}
+camera_speed : f32 = 0.05
+fov : f32 = 45.0
 
 Vector4 :: [4]f32
 Vector3 :: [3]f32
@@ -26,6 +32,9 @@ main :: proc() {
     if window == nil {
       panic("Failed to create GLFW window")
     }
+    glfw.SetInputMode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
+    glfw.SetCursorPosCallback(window, mouse_callback)
+    glfw.SetScrollCallback(window, scroll_callback)
     glfw.MakeContextCurrent(window)
     glfw.SetFramebufferSizeCallback(window, framebuffer_resize_callback)
     gl.load_up_to(4, 1, glfw.gl_set_proc_address)
@@ -150,10 +159,12 @@ main :: proc() {
   wireframe_mode := false
   space_pressed := false
 
-  camera_pos := Vector3{0.0, 0.0, 3.0}
-  camera_target := Vector3{0.0, 0.0, 0.0}
-
+  delta_time := 0.0
+  last_frame := 0.0
   for !glfw.WindowShouldClose(window) {
+    current_frame := glfw.GetTime()
+    delta_time = current_frame - last_frame
+    last_frame = current_frame
     input: {
       if glfw.GetKey(window, glfw.KEY_ESCAPE) == glfw.PRESS {
         glfw.SetWindowShouldClose(window, true)
@@ -185,6 +196,22 @@ main :: proc() {
           mix_factor -= 0.01
         }
       }
+
+      camera_processing: {
+        camera_speed = 2.5 * f32( delta_time )
+        if glfw.GetKey(window, glfw.KEY_W) == glfw.PRESS {
+          camera_pos += camera_speed * camera_front
+        }
+        if glfw.GetKey(window, glfw.KEY_S) == glfw.PRESS {
+          camera_pos -= camera_speed * camera_front
+        }
+        if glfw.GetKey(window, glfw.KEY_A) == glfw.PRESS {
+          camera_pos -= linalg.normalize(linalg.cross(camera_front, camera_up)) * camera_speed
+        }
+        if glfw.GetKey(window, glfw.KEY_D) == glfw.PRESS {
+          camera_pos += linalg.normalize(linalg.cross(camera_front, camera_up)) * camera_speed
+        }
+      }
     }
     gl.Uniform1f(mix_factor_location, mix_factor)
     gl.ClearColor(0.2, 0.3, 0.3, 1.0)
@@ -208,14 +235,14 @@ main :: proc() {
     }
     for i in 0..<len(cubePositions) {
       position := cubePositions[i]
-      model_matrix := linalg.identity_matrix(matrix[4, 4]f32)
-      model_matrix = linalg.matrix_mul(model_matrix, linalg.matrix4_translate_f32(position))
       angle := f32(i+1) * 20.0
-      model_matrix = linalg.matrix_mul(model_matrix, linalg.matrix4_rotate_f32(f32(glfw.GetTime()) * math.to_radians_f32(angle), Vector3{1.0, 0.3, 0.5} ))
-      view_matrix := linalg.identity_matrix(matrix[4, 4]f32)
+      model_matrix := linalg.matrix_mul(linalg.matrix4_translate_f32(position), linalg.matrix4_rotate_f32(f32(glfw.GetTime()) * math.to_radians_f32(angle), Vector3{1.0, 0.3, 0.5} ))
+      radius : f32 = 10.0
+      cam_x := math.sin(f32( glfw.GetTime() )) * radius
+      cam_z := math.cos(f32( glfw.GetTime() )) * radius
+      view_matrix := linalg.matrix4_look_at_f32(camera_pos, camera_pos + camera_front, camera_up)
       view_matrix = linalg.matrix_mul(view_matrix, linalg.matrix4_translate_f32(Vector3{0.0, 0.0, -3.0} ))
-      projection_matrix := linalg.identity_matrix(matrix[4, 4]f32)
-      projection_matrix = linalg.matrix_mul(projection_matrix, linalg.matrix4_perspective_f32(math.to_radians_f32(45.0), 800.0 / 600.0, 0.1, 100.0))
+      projection_matrix := linalg.matrix4_perspective_f32(math.to_radians_f32(fov), 800.0/600.0, 0.1, 100.0)
 
       gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "model"), 1, false, raw_data(&model_matrix))
       gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "view"), 1, false, raw_data(&view_matrix))
