@@ -10,6 +10,10 @@ framebuffer_resize_callback :: proc "c" (window: glfw.WindowHandle, width, heigh
   gl.Viewport(0, 0, width, height)
 }
 
+Vector4 :: [4]f32
+Vector3 :: [3]f32
+Vector2 :: [2]f32
+
 main :: proc() {
   window: glfw.WindowHandle
   init: {
@@ -146,6 +150,9 @@ main :: proc() {
   wireframe_mode := false
   space_pressed := false
 
+  camera_pos := Vector3{0.0, 0.0, 3.0}
+  camera_target := Vector3{0.0, 0.0, 0.0}
+
   for !glfw.WindowShouldClose(window) {
     input: {
       if glfw.GetKey(window, glfw.KEY_ESCAPE) == glfw.PRESS {
@@ -187,7 +194,7 @@ main :: proc() {
     gl.ActiveTexture(gl.TEXTURE1)
     gl.BindTexture(gl.TEXTURE_2D, texture_2)
     gl.BindVertexArray(vao)
-    cubePositions := [][3]f32{
+    cubePositions := []Vector3{
       {0.0,  0.0,  0.0},
       {2.0,  5.0, -15.0},
       {-1.5, -2.2, -2.5},
@@ -204,9 +211,9 @@ main :: proc() {
       model_matrix := linalg.identity_matrix(matrix[4, 4]f32)
       model_matrix = linalg.matrix_mul(model_matrix, linalg.matrix4_translate_f32(position))
       angle := f32(i+1) * 20.0
-      model_matrix = linalg.matrix_mul(model_matrix, linalg.matrix4_rotate_f32(f32(glfw.GetTime()) * math.to_radians_f32(angle), [3]f32{1.0, 0.3, 0.5} ))
+      model_matrix = linalg.matrix_mul(model_matrix, linalg.matrix4_rotate_f32(f32(glfw.GetTime()) * math.to_radians_f32(angle), Vector3{1.0, 0.3, 0.5} ))
       view_matrix := linalg.identity_matrix(matrix[4, 4]f32)
-      view_matrix = linalg.matrix_mul(view_matrix, linalg.matrix4_translate_f32([3]f32{0.0, 0.0, -3.0} ))
+      view_matrix = linalg.matrix_mul(view_matrix, linalg.matrix4_translate_f32(Vector3{0.0, 0.0, -3.0} ))
       projection_matrix := linalg.identity_matrix(matrix[4, 4]f32)
       projection_matrix = linalg.matrix_mul(projection_matrix, linalg.matrix4_perspective_f32(math.to_radians_f32(45.0), 800.0 / 600.0, 0.1, 100.0))
 
