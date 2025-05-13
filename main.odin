@@ -68,47 +68,47 @@ main :: proc() {
   }
 
   vertices := []f32{
-    -0.5, -0.5, -0.5, 
-    0.5, -0.5, -0.5,  
-    0.5,  0.5, -0.5,  
-    0.5,  0.5, -0.5,  
-    -0.5,  0.5, -0.5, 
-    -0.5, -0.5, -0.5, 
+    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
+     0.5, -0.5, -0.5,  0.0,  0.0, -1.0, 
+     0.5,  0.5, -0.5,  0.0,  0.0, -1.0, 
+     0.5,  0.5, -0.5,  0.0,  0.0, -1.0, 
+    -0.5,  0.5, -0.5,  0.0,  0.0, -1.0, 
+    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0, 
 
-    -0.5, -0.5,  0.5, 
-    0.5, -0.5,  0.5,  
-    0.5,  0.5,  0.5,  
-    0.5,  0.5,  0.5,  
-    -0.5,  0.5,  0.5, 
-    -0.5, -0.5,  0.5, 
+    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
+     0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
+     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
+     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
+    -0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
+    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
 
-    -0.5,  0.5,  0.5, 
-    -0.5,  0.5, -0.5, 
-    -0.5, -0.5, -0.5, 
-    -0.5, -0.5, -0.5, 
-    -0.5, -0.5,  0.5, 
-    -0.5,  0.5,  0.5, 
+    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
+    -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,
+    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
+    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
+    -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,
+    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
 
-    0.5,  0.5,  0.5,  
-    0.5,  0.5, -0.5,  
-    0.5, -0.5, -0.5,  
-    0.5, -0.5, -0.5,  
-    0.5, -0.5,  0.5,  
-    0.5,  0.5,  0.5,  
+     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
+     0.5,  0.5, -0.5,  1.0,  0.0,  0.0,
+     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
+     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
+     0.5, -0.5,  0.5,  1.0,  0.0,  0.0,
+     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
 
-    -0.5, -0.5, -0.5, 
-    0.5, -0.5, -0.5,  
-    0.5, -0.5,  0.5,  
-    0.5, -0.5,  0.5,  
-    -0.5, -0.5,  0.5, 
-    -0.5, -0.5, -0.5, 
+    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+     0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+    -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
 
-    -0.5,  0.5, -0.5, 
-    0.5,  0.5, -0.5,  
-    0.5,  0.5,  0.5,  
-    0.5,  0.5,  0.5,  
-    -0.5,  0.5,  0.5, 
-    -0.5,  0.5, -0.5, 
+    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
+     0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
+     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+    -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
   }
 
 
@@ -161,17 +161,20 @@ main :: proc() {
 
     gl.BindVertexArray(cube_vao)
 
-    gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 3 * size_of(f32), 0)
+    gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 6 * size_of(f32), 0)
     gl.EnableVertexAttribArray(0)
+    gl.VertexAttribPointer(1, 3, gl.FLOAT, false, 6 * size_of(f32), 3 * size_of(f32))
+    gl.EnableVertexAttribArray(1)
 
     gl.GenVertexArrays(1, &light_vao)
     gl.BindVertexArray(light_vao)
     gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 
-    gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 3 * size_of(f32), 0)
+    gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 6 * size_of(f32), 0)
     gl.EnableVertexAttribArray(0)
   }
 
+  light_pos := Vector3{1.2, 1.0, 2.0}
   for !glfw.WindowShouldClose(window) {
     handle_input(window)
     current_frame := glfw.GetTime()
@@ -194,13 +197,14 @@ main :: proc() {
     
     model := linalg.identity(matrix[4, 4]f32)
     gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "model"), 1, false, raw_data(&model))
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "lightPos"), 1, raw_data(&light_pos))
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "cameraPos"), 1, raw_data(&camera_pos))
     gl.BindVertexArray(cube_vao)
     gl.DrawArrays(gl.TRIANGLES, 0, 36)
 
     gl.UseProgram(light_shader_program)
     gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "projection"), 1, false, raw_data(&projection))
     gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "view"), 1, false, raw_data(&view))
-    light_pos := Vector3{1.2, 1.0, 2.0}
     model = linalg.matrix_mul(linalg.matrix4_translate_f32(light_pos), linalg.matrix4_scale_f32(0.2))
     gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "model"), 1, false, raw_data(&model))
     gl.BindVertexArray(light_vao)
