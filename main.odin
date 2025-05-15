@@ -184,11 +184,28 @@ main :: proc() {
     gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     gl.UseProgram(shader_program)
     object_color_position := gl.GetUniformLocation(shader_program, "objectColor")
-    light_color_position := gl.GetUniformLocation(shader_program, "lightColor")
-    light_color := Vector3{1.0, 1.0, 1.0}
     object_color := Vector3{1.0, 0.5, 0.31}
     gl.Uniform3fv(object_color_position, 1, raw_data(&object_color))
-    gl.Uniform3fv(light_color_position, 1, raw_data(&light_color))
+    ambient_color := Vector3{1.0, 0.5, 0.31}
+    diffuse_color := Vector3{1.0, 0.5, 0.31}
+    specular_color := Vector3{0.5, 0.5, 0.5}
+    shininess := f32(32)
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "material.ambient"), 1, raw_data(&ambient_color))
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "material.diffuse"), 1, raw_data(&diffuse_color))
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "material.specular"), 1, raw_data(&specular_color))
+    gl.Uniform1f(gl.GetUniformLocation(shader_program, "material.shininess"), shininess)
+
+    light_color: Vector3
+    light_color.r = math.sin(f32( current_frame * 2.0 ))
+    light_color.g = math.sin(f32( current_frame * 0.7 ))
+    light_color.b = math.sin(f32( current_frame * 1.3 ))
+    light_diffuse := light_color * 0.5
+    light_ambient := light_color * 0.2
+    light_specular := Vector3{1.0, 1.0, 1.0}
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.ambient"), 1, raw_data(&light_ambient))
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.diffuse"), 1, raw_data(&light_diffuse))
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.specular"), 1, raw_data(&light_specular))
+
     light_pos.y = math.sin(f32(current_frame))
     light_pos.x = math.cos(f32(current_frame))
     light_pos.z = math.cos(f32(current_frame))
@@ -200,7 +217,7 @@ main :: proc() {
     
     model := linalg.identity(matrix[4, 4]f32)
     gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "model"), 1, false, raw_data(&model))
-    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "lightPos"), 1, raw_data(&light_pos))
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.position"), 1, raw_data(&light_pos))
     gl.Uniform3fv(gl.GetUniformLocation(shader_program, "cameraPos"), 1, raw_data(&camera_pos))
     gl.BindVertexArray(cube_vao)
     gl.DrawArrays(gl.TRIANGLES, 0, 36)
