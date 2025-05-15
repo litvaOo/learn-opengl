@@ -223,6 +223,7 @@ main :: proc() {
     gl.DrawArrays(gl.TRIANGLES, 0, 36)
 
     gl.UseProgram(light_shader_program)
+    gl.Uniform3fv(gl.GetUniformLocation(light_shader_program, "lightColor"), 1, raw_data(&light_color))
     gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "projection"), 1, false, raw_data(&projection))
     gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "view"), 1, false, raw_data(&view))
     model = linalg.matrix_mul(linalg.matrix4_translate_f32(light_pos), linalg.matrix4_scale_f32(0.2))
