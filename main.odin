@@ -196,9 +196,9 @@ main :: proc() {
     gl.Uniform1f(gl.GetUniformLocation(shader_program, "material.shininess"), shininess)
 
     light_color: Vector3
-    light_color.r = math.sin(f32( current_frame * 2.0 ))
-    light_color.g = math.sin(f32( current_frame * 0.7 ))
-    light_color.b = math.sin(f32( current_frame * 1.3 ))
+    light_color.r = math.sin(f32( current_frame * 2.0 )) / 2.0 + 0.5
+    light_color.g = math.sin(f32( current_frame * 0.7 )) / 2.0 + 0.5
+    light_color.b = math.sin(f32( current_frame * 1.3 )) / 2.0 + 0.5
     light_diffuse := light_color * 0.5
     light_ambient := light_color * 0.2
     light_specular := Vector3{1.0, 1.0, 1.0}
