@@ -189,6 +189,9 @@ main :: proc() {
     object_color := Vector3{1.0, 0.5, 0.31}
     gl.Uniform3fv(object_color_position, 1, raw_data(&object_color))
     gl.Uniform3fv(light_color_position, 1, raw_data(&light_color))
+    light_pos.y = math.sin(f32(current_frame))
+    light_pos.x = math.cos(f32(current_frame))
+    light_pos.z = math.cos(f32(current_frame))
 
     projection := linalg.matrix4_perspective_f32(math.to_radians_f32(fov), 800.0 / 600.0, 0.1, 100.0)
     view := linalg.matrix4_look_at_f32(camera_pos, camera_pos + camera_front, camera_up)
