@@ -68,47 +68,47 @@ main :: proc() {
   }
 
   vertices := []f32{
-    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
-     0.5, -0.5, -0.5,  0.0,  0.0, -1.0, 
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0, 
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0, 
-    -0.5,  0.5, -0.5,  0.0,  0.0, -1.0, 
-    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0, 
+    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
+     0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 0.0,
+     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
+     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
+    -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 1.0,
+    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
 
-    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
-     0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
-    -0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
-    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
+    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,   0.0, 0.0,
+     0.5, -0.5,  0.5,  0.0,  0.0, 1.0,   1.0, 0.0,
+     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,   1.0, 1.0,
+     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,   1.0, 1.0,
+    -0.5,  0.5,  0.5,  0.0,  0.0, 1.0,   0.0, 1.0,
+    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,   0.0, 0.0,
 
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
-    -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
-    -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
+    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
+    -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0, 1.0,
+    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
+    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
+    -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0, 0.0,
+    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
 
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
-     0.5,  0.5, -0.5,  1.0,  0.0,  0.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
-     0.5, -0.5,  0.5,  1.0,  0.0,  0.0,
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
+     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
+     0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0, 1.0,
+     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
+     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
+     0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0, 0.0,
+     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
 
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
-     0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
-    -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
+     0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0, 1.0,
+     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
+     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
+    -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0, 0.0,
+    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
 
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
-     0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
-    -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
+    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0,
+     0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0, 1.0,
+     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
+     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
+    -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0, 0.0,
+    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0,
   }
 
 
@@ -161,20 +161,70 @@ main :: proc() {
 
     gl.BindVertexArray(cube_vao)
 
-    gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 6 * size_of(f32), 0)
+    gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 8 * size_of(f32), 0)
     gl.EnableVertexAttribArray(0)
-    gl.VertexAttribPointer(1, 3, gl.FLOAT, false, 6 * size_of(f32), 3 * size_of(f32))
+    gl.VertexAttribPointer(1, 3, gl.FLOAT, false, 8 * size_of(f32), 3 * size_of(f32))
     gl.EnableVertexAttribArray(1)
+    gl.VertexAttribPointer(2, 2, gl.FLOAT, false, 8 * size_of(f32), 6 * size_of(f32))
+    gl.EnableVertexAttribArray(2)
 
     gl.GenVertexArrays(1, &light_vao)
     gl.BindVertexArray(light_vao)
     gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 
-    gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 6 * size_of(f32), 0)
+    gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 8 * size_of(f32), 0)
     gl.EnableVertexAttribArray(0)
   }
 
   light_pos := Vector3{1.2, 1.0, 2.0}
+  gl.UseProgram(shader_program)
+  cube_texture: u32
+  {
+    gl.GenTextures(1, &cube_texture)
+    tex_width, tex_height, tex_channels, cube_texture_data := read_texture("assets/container2.png")
+    gl.BindTexture(gl.TEXTURE_2D, cube_texture)
+    format: u32;
+    switch tex_channels {
+    case 1:
+      format = gl.RED
+    case 3:
+      format = gl.RGB
+    case 4:
+      format = gl.RGBA
+    }
+    gl.TexImage2D(gl.TEXTURE_2D, 0, i32( format ), tex_width, tex_height, 0, format, gl.UNSIGNED_BYTE, cube_texture_data)
+    gl.GenerateMipmap(gl.TEXTURE_2D)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  }
+
+  cube_specular: u32
+  {
+    gl.GenTextures(1, &cube_specular)
+    tex_width, tex_height, tex_channels, cube_texture_data := read_texture("assets/container2_specular.png")
+    gl.BindTexture(gl.TEXTURE_2D, cube_specular)
+    format: u32;
+    switch tex_channels {
+    case 1:
+      format = gl.RED
+    case 3:
+      format = gl.RGB
+    case 4:
+      format = gl.RGBA
+    }
+    gl.TexImage2D(gl.TEXTURE_2D, 0, i32( format ), tex_width, tex_height, 0, format, gl.UNSIGNED_BYTE, cube_texture_data)
+    gl.GenerateMipmap(gl.TEXTURE_2D)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  }
+
+  gl.UseProgram(shader_program)
+  gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.diffuse"), 0)
+  gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.specular"), 1)
   for !glfw.WindowShouldClose(window) {
     handle_input(window)
     current_frame := glfw.GetTime()
@@ -183,16 +233,7 @@ main :: proc() {
     gl.ClearColor(0.1, 0.1, 0.1, 1.0)
     gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     gl.UseProgram(shader_program)
-    object_color_position := gl.GetUniformLocation(shader_program, "objectColor")
-    object_color := Vector3{1.0, 0.5, 0.31}
-    gl.Uniform3fv(object_color_position, 1, raw_data(&object_color))
-    ambient_color := Vector3{1.0, 0.5, 0.31}
-    diffuse_color := Vector3{1.0, 0.5, 0.31}
-    specular_color := Vector3{0.5, 0.5, 0.5}
     shininess := f32(32)
-    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "material.ambient"), 1, raw_data(&ambient_color))
-    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "material.diffuse"), 1, raw_data(&diffuse_color))
-    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "material.specular"), 1, raw_data(&specular_color))
     gl.Uniform1f(gl.GetUniformLocation(shader_program, "material.shininess"), shininess)
 
     light_color: Vector3
@@ -214,11 +255,16 @@ main :: proc() {
     view := linalg.matrix4_look_at_f32(camera_pos, camera_pos + camera_front, camera_up)
     gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "projection"), 1, false, raw_data(&projection))
     gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "view"), 1, false, raw_data(&view))
-    
+
     model := linalg.identity(matrix[4, 4]f32)
     gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "model"), 1, false, raw_data(&model))
     gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.position"), 1, raw_data(&light_pos))
     gl.Uniform3fv(gl.GetUniformLocation(shader_program, "cameraPos"), 1, raw_data(&camera_pos))
+
+    gl.ActiveTexture(gl.TEXTURE0)
+    gl.BindTexture(gl.TEXTURE_2D, cube_texture)
+    gl.ActiveTexture(gl.TEXTURE1)
+    gl.BindTexture(gl.TEXTURE_2D, cube_specular)
     gl.BindVertexArray(cube_vao)
     gl.DrawArrays(gl.TRIANGLES, 0, 36)
 
