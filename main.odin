@@ -27,56 +27,13 @@ main :: proc() {
     gl.Enable(gl.DEPTH_TEST)
   }
 
-  vertices := []f32{
-    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
-     0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 0.0,
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0, 1.0,
-    -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 1.0,
-    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0, 0.0,
-
-    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,   0.0, 0.0,
-     0.5, -0.5,  0.5,  0.0,  0.0, 1.0,   1.0, 0.0,
-     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,   1.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,   1.0, 1.0,
-    -0.5,  0.5,  0.5,  0.0,  0.0, 1.0,   0.0, 1.0,
-    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,   0.0, 0.0,
-
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
-    -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0, 1.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0, 1.0,
-    -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0, 0.0,
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0, 0.0,
-
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
-     0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0, 1.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0, 1.0,
-     0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0, 0.0,
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0, 0.0,
-
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
-     0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0, 1.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0, 0.0,
-    -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0, 0.0,
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0, 1.0,
-
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0,
-     0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0, 0.0,
-    -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0, 0.0,
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0, 1.0,
-  }
-
-
   shader_program := create_shader_program("shaders/shader.vert", "shaders/shader.frag")
   light_shader_program := create_shader_program("shaders/light_shader.vert", "shaders/light_shader.frag")
+  cube_texture := create_texture("assets/container2.png")
+  cube_specular := create_texture("assets/container2_specular.png")
+  cube_emission := create_texture("assets/matrix.jpg")
 
   light_vao, cube_vao, vbo: u32
-  vaos := []u32{light_vao, cube_vao}
   buffer_setup: {
     gl.GenVertexArrays(1, &cube_vao)
     gl.GenBuffers(1, &vbo)
@@ -101,17 +58,16 @@ main :: proc() {
     gl.EnableVertexAttribArray(0)
   }
 
-  light_pos := Vector3{1.2, 1.0, 2.0}
-  gl.UseProgram(shader_program)
-
-  cube_texture := create_texture("assets/container2.png")
-  cube_specular := create_texture("assets/container2_specular.png")
-  cube_emission := create_texture("assets/matrix.jpg")
 
   gl.UseProgram(shader_program)
-  gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.diffuse"), 0)
-  gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.specular"), 1)
-  gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.emission"), 2)
+  static_uniforms: {
+    gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.diffuse"), 0)
+    gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.specular"), 1)
+    gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.emission"), 2)
+    gl.Uniform1f(gl.GetUniformLocation(shader_program, "material.shininess"), shininess)
+    model := linalg.identity(matrix[4, 4]f32)
+    gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "model"), 1, false, raw_data(&model))
+  }
   for !glfw.WindowShouldClose(window) {
     handle_input(window)
     current_frame := glfw.GetTime()
@@ -120,8 +76,6 @@ main :: proc() {
     gl.ClearColor(0.1, 0.1, 0.1, 1.0)
     gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     gl.UseProgram(shader_program)
-    shininess := f32(32)
-    gl.Uniform1f(gl.GetUniformLocation(shader_program, "material.shininess"), shininess)
 
     light_color: Vector3
     light_color.r = math.sin(f32( current_frame * 2.0 )) / 2.0 + 0.5
@@ -142,9 +96,6 @@ main :: proc() {
     view := linalg.matrix4_look_at_f32(camera_pos, camera_pos + camera_front, camera_up)
     gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "projection"), 1, false, raw_data(&projection))
     gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "view"), 1, false, raw_data(&view))
-
-    model := linalg.identity(matrix[4, 4]f32)
-    gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "model"), 1, false, raw_data(&model))
     gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.position"), 1, raw_data(&light_pos))
     gl.Uniform3fv(gl.GetUniformLocation(shader_program, "cameraPos"), 1, raw_data(&camera_pos))
 
@@ -161,7 +112,7 @@ main :: proc() {
     gl.Uniform3fv(gl.GetUniformLocation(light_shader_program, "lightColor"), 1, raw_data(&light_color))
     gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "projection"), 1, false, raw_data(&projection))
     gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "view"), 1, false, raw_data(&view))
-    model = linalg.matrix_mul(linalg.matrix4_translate_f32(light_pos), linalg.matrix4_scale_f32(0.2))
+    model := linalg.matrix_mul(linalg.matrix4_translate_f32(light_pos), linalg.matrix4_scale_f32(0.2))
     gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "model"), 1, false, raw_data(&model))
     gl.BindVertexArray(light_vao)
     gl.DrawArrays(gl.TRIANGLES, 0, 36)
