@@ -9,6 +9,7 @@ in vec2 texCoords;
 struct Material {
   sampler2D diffuse;
   sampler2D specular;
+  sampler2D emission;
   float shininess;
 };
 
@@ -38,6 +39,13 @@ void main() {
   vec3 diffuse = diff * light.diffuse * texture(material.diffuse, texCoords).rgb;
   vec3 specular = texture(material.specular, texCoords).rgb * spec * light.specular;
 
-  vec3 result = ambient + diffuse + specular;
+  vec3 emission;
+  if (dot(texture(material.specular, texCoords).rgb, vec3(1.0)) <= 0.1) {
+    emission = texture(material.emission, texCoords).rgb;
+  } else {
+    emission = vec3(0.0, 0.0, 0.0);
+  }
+
+  vec3 result = ambient + diffuse + specular + emission;
   FragColor = vec4(result, 1.0);
 }

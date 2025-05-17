@@ -222,9 +222,32 @@ main :: proc() {
     gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
   }
 
+  cube_emission: u32
+  {
+    gl.GenTextures(1, &cube_emission)
+    tex_width, tex_height, tex_channels, cube_texture_data := read_texture("assets/matrix.jpg")
+    gl.BindTexture(gl.TEXTURE_2D, cube_emission)
+    format: u32;
+    switch tex_channels {
+    case 1:
+      format = gl.RED
+    case 3:
+      format = gl.RGB
+    case 4:
+      format = gl.RGBA
+    }
+    gl.TexImage2D(gl.TEXTURE_2D, 0, i32( format ), tex_width, tex_height, 0, format, gl.UNSIGNED_BYTE, cube_texture_data)
+    gl.GenerateMipmap(gl.TEXTURE_2D)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+  }
+
   gl.UseProgram(shader_program)
   gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.diffuse"), 0)
   gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.specular"), 1)
+  gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.emission"), 2)
   for !glfw.WindowShouldClose(window) {
     handle_input(window)
     current_frame := glfw.GetTime()
@@ -265,6 +288,8 @@ main :: proc() {
     gl.BindTexture(gl.TEXTURE_2D, cube_texture)
     gl.ActiveTexture(gl.TEXTURE1)
     gl.BindTexture(gl.TEXTURE_2D, cube_specular)
+    gl.ActiveTexture(gl.TEXTURE2)
+    gl.BindTexture(gl.TEXTURE_2D, cube_emission)
     gl.BindVertexArray(cube_vao)
     gl.DrawArrays(gl.TRIANGLES, 0, 36)
 
