@@ -6,47 +6,6 @@ import "core:strings"
 import "core:math"
 import "core:math/linalg"
 
-mix_factor :f32 = 0.2
-wireframe_mode := false
-space_pressed := false
-
-delta_time := 0.0
-last_frame := 0.0
-last_x, last_y : f32 = 400, 300
-yaw : f32 = -90.0
-pitch : f32 = 0
-first_mouse := true
-camera_pos := Vector3{0.0, 0.0, 3.0}
-camera_front := Vector3{0.0, 0.0, -1.0}
-camera_up := Vector3{0.0, 1.0, 0.0}
-camera_speed : f32 = 0.05
-fov : f32 = 45.0
-
-Vector4 :: [4]f32
-Vector3 :: [3]f32
-Vector2 :: [2]f32
-
-look_at :: proc(position, target, up: Vector3) -> matrix[4, 4]f32{
-  camera_matrix := linalg.identity(matrix[4, 4]f32)
-  camera_matrix[0][3] = -position.x
-  camera_matrix[1][3] = -position.y
-  camera_matrix[2][3] = -position.z
-
-  right_vector := linalg.cross(up, target)
-
-  result := linalg.identity(matrix[4, 4]f32)
-  result[0][0] = right_vector.x
-  result[0][1] = right_vector.y
-  result[0][2] = right_vector.z
-  result[1][0] = up.x
-  result[1][1] = up.y
-  result[1][2] = up.z
-  result[2][0] = target.x
-  result[2][1] = target.y
-  result[2][2] = target.z
-  return linalg.matrix_mul(camera_matrix, result)
-}
-
 main :: proc() {
   window: glfw.WindowHandle
   init: {
@@ -65,6 +24,7 @@ main :: proc() {
     glfw.MakeContextCurrent(window)
     glfw.SetFramebufferSizeCallback(window, framebuffer_resize_callback)
     gl.load_up_to(4, 1, glfw.gl_set_proc_address)
+    gl.Enable(gl.DEPTH_TEST)
   }
 
   vertices := []f32{
@@ -112,43 +72,8 @@ main :: proc() {
   }
 
 
-  shader_program := gl.CreateProgram()
-  light_shader_program := gl.CreateProgram()
-  shaders: {
-    vertex_shader := gl.CreateShader(gl.VERTEX_SHADER)
-    vertex_shader_source_raw := read_file("shaders/shader.vert")
-    vertex_shader_source := cstring(raw_data(vertex_shader_source_raw))
-    gl.ShaderSource(vertex_shader, 1, &vertex_shader_source, nil)
-    gl.CompileShader(vertex_shader)
-
-    fragment_shader := gl.CreateShader(gl.FRAGMENT_SHADER)
-    fragment_shader_source_raw := read_file("shaders/shader.frag")
-    fragment_shader_source := cstring(raw_data(fragment_shader_source_raw))
-    gl.ShaderSource(fragment_shader, 1, &fragment_shader_source, nil)
-    gl.CompileShader(fragment_shader)
-
-    gl.AttachShader(shader_program, vertex_shader)
-    gl.AttachShader(shader_program, fragment_shader)
-    gl.LinkProgram(shader_program)
-
-    vertex_shader_light := gl.CreateShader(gl.VERTEX_SHADER)
-    vertex_shader_light_source_raw := read_file("shaders/light_shader.vert")
-    vertex_shader_light_source := cstring(raw_data(vertex_shader_light_source_raw))
-    gl.ShaderSource(vertex_shader_light, 1, &vertex_shader_light_source, nil)
-    gl.CompileShader(vertex_shader_light)
-
-    fragment_shader_light := gl.CreateShader(gl.FRAGMENT_SHADER)
-    fragment_shader_light_source_raw := read_file("shaders/light_shader.frag")
-    fragment_shader_light_source := cstring(raw_data(fragment_shader_light_source_raw))
-    gl.ShaderSource(fragment_shader_light, 1, &fragment_shader_light_source, nil)
-    gl.CompileShader(fragment_shader_light)
-
-    gl.AttachShader(light_shader_program, vertex_shader_light)
-    gl.AttachShader(light_shader_program, fragment_shader_light)
-    gl.LinkProgram(light_shader_program)
-
-    gl.Enable(gl.DEPTH_TEST)
-  }
+  shader_program := create_shader_program("shaders/shader.vert", "shaders/shader.frag")
+  light_shader_program := create_shader_program("shaders/light_shader.vert", "shaders/light_shader.frag")
 
   light_vao, cube_vao, vbo: u32
   vaos := []u32{light_vao, cube_vao}

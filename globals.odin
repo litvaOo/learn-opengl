@@ -1,0 +1,23 @@
+package main
+
+mix_factor :f32 = 0.2
+wireframe_mode := false
+space_pressed := false
+
+delta_time := 0.0
+last_frame := 0.0
+last_x, last_y : f32 = 400, 300
+yaw : f32 = -90.0
+pitch : f32 = 0
+first_mouse := true
+camera_pos := Vector3{0.0, 0.0, 3.0}
+camera_front := Vector3{0.0, 0.0, -1.0}
+camera_up := Vector3{0.0, 1.0, 0.0}
+camera_speed : f32 = 0.05
+fov : f32 = 45.0
+
+Vector4 :: [4]f32
+Vector3 :: [3]f32
+Vector2 :: [2]f32
+
+
