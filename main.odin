@@ -5,6 +5,7 @@ import glfw "vendor:glfw"
 import "core:strings"
 import "core:math"
 import "core:math/linalg"
+import "core:fmt"
 
 main :: proc() {
   window: glfw.WindowHandle
@@ -65,9 +66,16 @@ main :: proc() {
     gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.specular"), 1)
     gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.emission"), 2)
     gl.Uniform1f(gl.GetUniformLocation(shader_program, "material.shininess"), shininess)
-    model := linalg.identity(matrix[4, 4]f32)
-    gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "model"), 1, false, raw_data(&model))
+    light_direction := Vector3{-0.2, -1.0, -0.3}
+    gl.Uniform1f(gl.GetUniformLocation(shader_program, "light.cutOff"), math.cos(math.to_radians_f32(12.5)))
+    gl.Uniform1f(gl.GetUniformLocation(shader_program, "light.outerCutOff"), math.cos(math.to_radians_f32(17.5)))
+
+
+    gl.Uniform1f(gl.GetUniformLocation(shader_program, "light.constant"), 1.0)
+    gl.Uniform1f(gl.GetUniformLocation(shader_program, "light.linear"), 0.09)
+    gl.Uniform1f(gl.GetUniformLocation(shader_program, "light.quadratic"), 0.032)
   }
+
   for !glfw.WindowShouldClose(window) {
     handle_input(window)
     current_frame := glfw.GetTime()
@@ -82,21 +90,18 @@ main :: proc() {
     light_color.g = math.sin(f32( current_frame * 0.7 )) / 2.0 + 0.5
     light_color.b = math.sin(f32( current_frame * 1.3 )) / 2.0 + 0.5
     light_diffuse := light_color * 0.5
-    light_ambient := light_color * 0.2
+    light_ambient := light_color * 0.5
     light_specular := Vector3{1.0, 1.0, 1.0}
     gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.ambient"), 1, raw_data(&light_ambient))
     gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.diffuse"), 1, raw_data(&light_diffuse))
     gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.specular"), 1, raw_data(&light_specular))
-
-    light_pos.y = math.sin(f32(current_frame))
-    light_pos.x = math.cos(f32(current_frame))
-    light_pos.z = math.cos(f32(current_frame))
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.direction"), 1, raw_data(&camera_front))
+    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.position"), 1, raw_data(&camera_pos))
 
     projection := linalg.matrix4_perspective_f32(math.to_radians_f32(fov), 800.0 / 600.0, 0.1, 100.0)
     view := linalg.matrix4_look_at_f32(camera_pos, camera_pos + camera_front, camera_up)
     gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "projection"), 1, false, raw_data(&projection))
     gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "view"), 1, false, raw_data(&view))
-    gl.Uniform3fv(gl.GetUniformLocation(shader_program, "light.position"), 1, raw_data(&light_pos))
     gl.Uniform3fv(gl.GetUniformLocation(shader_program, "cameraPos"), 1, raw_data(&camera_pos))
 
     gl.ActiveTexture(gl.TEXTURE0)
@@ -106,16 +111,26 @@ main :: proc() {
     gl.ActiveTexture(gl.TEXTURE2)
     gl.BindTexture(gl.TEXTURE_2D, cube_emission)
     gl.BindVertexArray(cube_vao)
-    gl.DrawArrays(gl.TRIANGLES, 0, 36)
+    model := linalg.identity(matrix[4, 4]f32)
+    for i in 0..<len(&cube_positions) {
+      model = linalg.matrix_mul(linalg.identity(matrix[4, 4]f32), linalg.matrix4_translate_f32(cube_positions[i]))
+      angle : f32 = 20.0 * f32(math.cos(glfw.GetTime())) * f32(i+1)
+      model = linalg.matrix_mul(
+          model, linalg.matrix4_rotate_f32(math.to_radians_f32(angle),
+            f32(i+1) * Vector3{1.0, f32(math.cos(glfw.GetTime())), f32(math.sin(glfw.GetTime()))}))
+      gl.UniformMatrix4fv(gl.GetUniformLocation(shader_program, "model"), 1, false, raw_data(&model))
+      gl.DrawArrays(gl.TRIANGLES, 0, 36)
+    }
 
-    gl.UseProgram(light_shader_program)
-    gl.Uniform3fv(gl.GetUniformLocation(light_shader_program, "lightColor"), 1, raw_data(&light_color))
-    gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "projection"), 1, false, raw_data(&projection))
-    gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "view"), 1, false, raw_data(&view))
-    model := linalg.matrix_mul(linalg.matrix4_translate_f32(light_pos), linalg.matrix4_scale_f32(0.2))
-    gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "model"), 1, false, raw_data(&model))
-    gl.BindVertexArray(light_vao)
-    gl.DrawArrays(gl.TRIANGLES, 0, 36)
+
+    // gl.UseProgram(light_shader_program)
+    // gl.Uniform3fv(gl.GetUniformLocation(light_shader_program, "lightColor"), 1, raw_data(&light_color))
+    // gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "projection"), 1, false, raw_data(&projection))
+    // gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "view"), 1, false, raw_data(&view))
+    // model = linalg.matrix_mul(linalg.matrix4_translate_f32(light_pos), linalg.matrix4_scale_f32(0.2))
+    // gl.UniformMatrix4fv(gl.GetUniformLocation(light_shader_program, "model"), 1, false, raw_data(&model))
+    // gl.BindVertexArray(light_vao)
+    // gl.DrawArrays(gl.TRIANGLES, 0, 36)
 
     glfw.SwapBuffers(window)
     glfw.PollEvents()
