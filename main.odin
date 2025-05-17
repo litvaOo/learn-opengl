@@ -178,71 +178,10 @@ main :: proc() {
 
   light_pos := Vector3{1.2, 1.0, 2.0}
   gl.UseProgram(shader_program)
-  cube_texture: u32
-  {
-    gl.GenTextures(1, &cube_texture)
-    tex_width, tex_height, tex_channels, cube_texture_data := read_texture("assets/container2.png")
-    gl.BindTexture(gl.TEXTURE_2D, cube_texture)
-    format: u32;
-    switch tex_channels {
-    case 1:
-      format = gl.RED
-    case 3:
-      format = gl.RGB
-    case 4:
-      format = gl.RGBA
-    }
-    gl.TexImage2D(gl.TEXTURE_2D, 0, i32( format ), tex_width, tex_height, 0, format, gl.UNSIGNED_BYTE, cube_texture_data)
-    gl.GenerateMipmap(gl.TEXTURE_2D)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-  }
 
-  cube_specular: u32
-  {
-    gl.GenTextures(1, &cube_specular)
-    tex_width, tex_height, tex_channels, cube_texture_data := read_texture("assets/container2_specular.png")
-    gl.BindTexture(gl.TEXTURE_2D, cube_specular)
-    format: u32;
-    switch tex_channels {
-    case 1:
-      format = gl.RED
-    case 3:
-      format = gl.RGB
-    case 4:
-      format = gl.RGBA
-    }
-    gl.TexImage2D(gl.TEXTURE_2D, 0, i32( format ), tex_width, tex_height, 0, format, gl.UNSIGNED_BYTE, cube_texture_data)
-    gl.GenerateMipmap(gl.TEXTURE_2D)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-  }
-
-  cube_emission: u32
-  {
-    gl.GenTextures(1, &cube_emission)
-    tex_width, tex_height, tex_channels, cube_texture_data := read_texture("assets/matrix.jpg")
-    gl.BindTexture(gl.TEXTURE_2D, cube_emission)
-    format: u32;
-    switch tex_channels {
-    case 1:
-      format = gl.RED
-    case 3:
-      format = gl.RGB
-    case 4:
-      format = gl.RGBA
-    }
-    gl.TexImage2D(gl.TEXTURE_2D, 0, i32( format ), tex_width, tex_height, 0, format, gl.UNSIGNED_BYTE, cube_texture_data)
-    gl.GenerateMipmap(gl.TEXTURE_2D)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
-    gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-  }
+  cube_texture := create_texture("assets/container2.png")
+  cube_specular := create_texture("assets/container2_specular.png")
+  cube_emission := create_texture("assets/matrix.jpg")
 
   gl.UseProgram(shader_program)
   gl.Uniform1i(gl.GetUniformLocation(shader_program, "material.diffuse"), 0)
